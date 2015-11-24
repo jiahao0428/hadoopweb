@@ -1,0 +1,32 @@
+A significant number of studies on the topic of origin
+destination (OD) matrices for traffic networks have been
+performed in the past. While some have formulated a unified
+framework for estimating or updating OD matrices based on
+traffic counts for a road network [4], others have focused on
+doing the same for congested road networks [5]. The topic
+of inferring passenger travel patterns from smart card data
+of rail networks in urban regions has also been studied in
+some detail in the past. One particular example is the case
+study in Shenzhen, China, in which Liu et al. [6] analyzed
+individual and collective passenger mobility patterns. However,
+their analysis relied heavily on empirical observations and
+could not make a strong distinction between common and
+individual spatial or temporal patterns. Li et al. [7] introduced
+the idea of clustering nearby stations and proposed models
+for identifying morning, afternoon and evening peak patterns.
+This study focused on using smart card data records resolved
+in both space and time to study the collective spatial and
+temporal mobility patterns. It also touched on studying travel
+patterns at the individual passenger level and their regularity.
+However, as in [6], Li et al. [7] did not make a clear distinction
+between patterns that are ¡§common¡¨ and ¡§individual¡¨. In
+some studies, clustering algorithms were applied to obtain
+spatio-temporal patterns [8]. The focus, here, however, was
+mainly on temporal patterns, and consequently spatial patterns
+received little attention, which are of particular importance.
+In conclusion, none of the above studies have shed light on
+joint and individual spatial patterns across different days of
+the week, or even different times of the day. We address this
+issue, by developing common and individual low-dimensional
+models for urban rail road networks by applying JIVE and
+COBE on smart card data.

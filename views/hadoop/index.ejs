@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+  	<head>
+    		<title>Hadoop Platform</title>
+    		<link rel='stylesheet' href='/stylesheets/style.css' />
+    		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular-animate.js"></script>
+    		<script src='https://rawgit.com/ghostbar/angular-file-model/master/angular-file-model.js'></script>
+    		<script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.14.3.js"></script>
+		<script>
+			var app = angular.module( 'MyApp', [ 'file-model', 'ui.bootstrap', 'ngAnimate' ])
+			.run( function ( $rootScope ) {
+				$rootScope.jobs = '';
+			});
+						
+
+			app.controller( 'tableList', function ( $scope, $rootScope, $http ) {
+                                $http.get( "job" )
+                                .success( function ( response ) { $rootScope.jobs = response; });
+
+				$rootScope.deleteJob = function ( id, index ) {
+					$http.delete( "job/" + id )
+					.success( function ( response ) { $rootScope.jobs.splice( index, 1 ); });
+				};
+
+				setInterval( function () {
+    					angular.forEach( $rootScope.jobs, function ( job, key ) {
+						if( $rootScope.jobs[ key ].status == 'pending' || $rootScope.jobs[ key ].status == 'running' ) {
+							$http.get( "job/" + job.id ).success( function ( response ) { 
+								$rootScope.jobs[key].status = response[0].status; 
+			
+								if( $rootScope.jobs[key].status == 'completed' ) {
+									$rootScope.jobs[key].output_dir = response[0].output_dir;	
+								}
+							});
+						}
+    					});
+				}, 5000 );
+                        });
+			
+			app.controller( 'ModalDemoCtrl', function ( $scope, $uibModal, $log ) {
+				$scope.animationsEnabled = true;
+
+  				$scope.open = function ( size ) {
+
+    				var modalInstance = $uibModal.open({
+      					animation: $scope.animationsEnabled,
+					templateUrl: 'myModalContent.html',
+					controller: 'ModalInstanceCtrl',
+					size: size });
+				};
+			});
+
+			app.controller( 'ModalInstanceCtrl', function ( $scope, $rootScope, $http, $uibModalInstance ) {
+				$scope.ok = function () {
+                                        var fD = new FormData();
+                                        fD.append( "file", $scope.textfile );
+					$scope.loading = true;
+                                        var request = $http({
+                                                method: "post",
+                                                url: "/upload",
+                                                transformRequest: function ( data, headersGetterFunction ) {
+                                                        return data;
+                                                },
+                                                headers: {
+                                                        'enctype': 'multipart/form-data;',
+                                                        'Content-Type': undefined
+                                                },
+                                                data: fD
+                                                });
+
+                                                request.success( function ( response ) {
+                                                        var request1 = $http({
+                                                                method: "post",
+                                                                url: "/job",
+                                                                data:{ job_name:$scope.job_name, mapperCode: $scope.mapperCode, reducerCode: $scope.reducerCode, filename: response.filename }
+                                                        });
+
+                                                        request1.success( function ( response ) {
+                                                                var job_id = response.job_id;
+								$scope.loading = false;
+								$http.get( "job/" + job_id )
+                                				.success( function ( response ) {
+									response = response[0];
+									$rootScope.jobs.push( response );
+    									$uibModalInstance.close();
+								});
+                                                        });
+                                                });
+				};
+
+  				$scope.cancel = function () {
+    					$uibModalInstance.dismiss( 'cancel' );
+  				};
+			});
+    		</script>
+  	</head>
+  	<body>
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container-fluid">
+				<div class="container">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        					<span class="sr-only">Toggle navigation</span>
+        					<span class="icon-bar"></span>
+        					<span class="icon-bar"></span>
+        					<span class="icon-bar"></span>
+      						</button>
+      						<a class="navbar-brand" href="#">Hadoop Platform</a>
+					</div>
+	 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+						<p class="navbar-text navbar-right">Signed in as <a href="#" class="navbar-link"><%=  username %></a></p>
+					</div>
+				</div>
+			</div>
+		</nav>
+                <div style="margin-top:20px;" ng-controller="ModalDemoCtrl">
+    			<script type="text/ng-template" id="myModalContent.html">
+        			<div class="modal-header">
+            				<h3 class="modal-title">Create Hadoop Job</h3>
+        			</div>
+        			<div class="modal-body">
+                			<div style="display: table;border-spacing: 10px;"><form name="jobForm">
+						<div style="display: table-row;">
+							<div style="display: table-cell;">Name: </div>
+							<div style="display: table-cell;"><input type="text" name="job_name" ng-model="job_name" required></div>
+						</div>
+                               			<div style="display: table-row;">
+                                       			<div style="display: table-cell;">Input File: </div>
+							<div style="display: table-cell;"><input type="file" name="textfile" file-model="textfile" accept=".txt" required></div>
+                               			</div>
+                               			<div style="display: table-caption; caption-side: bottom;">
+                                       			<textarea name="mapperCode" ng-model="mapperCode" rows="20" cols="100" placeholder="Place your mapper code here..." required></textarea>
+                                       			<textarea name="reducerCode" ng-model="reducerCode" rows="20" cols="100" placeholder="Place your reducer code here..." required></textarea>
+                               			</div>
+                			</div>
+ 				</div>
+        			<div class="modal-footer">
+					<span ng-show="loading"><img style="height:52px;width:52px;" src="/images/loading_spinner.gif"> Uploading... </span>
+                                        <button ng-click="ok()" ng-disabled="jobForm.job_name.$invalid || jobForm.textfile.$invalid || jobForm.mapperCode.$invalid || jobForm.reducerCode.$invalid" class="btn btn-primary">Submit</button>
+            				<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+        			</div></form>
+    			</script>
+
+                	<span><button class="btn btn-primary" ng-click="open('lg')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create Hadoop Job</button></span>
+                	<span><a class="btn btn-danger" href="/users/logout"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</a></span>
+        	</div>
+
+		<div ng-controller="tableList">
+			<h3>Job List</h3>
+
+			<form>
+    				<div class="form-group">
+      					<div class="input-group">
+        					<div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
+        					<input type="text" class="form-control" placeholder="Search..." ng-model="searchJob">
+      					</div>      
+    				</div>
+  			</form>
+
+                        <table class='table table-bordered'>
+				<thead>
+					<tr>
+						<th>Job Name</th>
+						<th>File</th>
+						<th>Status</th>
+						<th>Output File</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+                                	<tr ng-show="jobs.length != 0" ng-repeat="x in jobs | filter:searchJob">
+						<td>{{ x.job_name }}</td>
+                                       		<td>{{ x.file }}</td>
+                                        	<td>{{ x.status }}</td>
+						<td><a href="/download/{{ x.output_dir }}">{{ x.output_dir }}</a></td>
+						<td><span><button class="btn btn-danger" ng-click="deleteJob(x.id, $index)">Delete</button></span></td>
+                                	</tr>
+					<tr>
+						<td colspan="5" ng-show="jobs.length == 0"><div class="alert alert-info" role="alert">No data</div></td>
+					</tr>
+				</tbody>
+                        </table>
+                </div>	
+  	</body>
+</html>

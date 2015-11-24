@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+  	<head>
+    		<title><%= title %></title>
+    		<link rel='stylesheet' href='/stylesheets/style.css' />
+		<link rel='stylesheet' href='/stylesheets/login.css' />
+    		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
+    		<script src='https://rawgit.com/ghostbar/angular-file-model/master/angular-file-model.js'></script>
+    		<script>
+			var app = angular.module('MyApp', []);
+
+			app.controller('login', function($scope, $http) {
+				$scope.submitForm = function() {
+					var request = $http({
+                                                method: "post",
+                                                url: "/users/",
+                                                data: {name: $scope.name, password: $scope.password}
+                                       	});
+
+                                  	request.then(function(response) {
+						if(response.status == 200) {
+							window.location = "/hadoop";
+						} else {
+							$scope.status = 'Invalid username/password';alert($scope.status);						
+						}
+					});
+
+					request.error(function(){$scope.status = 'Invalid username/password';})
+				};
+			});
+    		</script>
+  	</head>
+  	<body>
+		<div ng-controller="login">
+			<div class="loginmodal-container">
+    				<h1><%= title %></h1>
+				<form ng-submit="submitForm()">
+					<input type="text" ng-model="name" name="name" placeholder="Username">
+					<input type="password" ng-model="password" name="pass" placeholder="Password">
+					<input type="submit" name="login" class="login loginmodal-submit" value="Login">
+				 </form>
+					
+				 <div class="login-help">
+					<a href="#">Register</a> - <a href="#">Forgot Password</a>
+					<div style='color:red;'>{{ status }}</div>
+				 </div>
+			</div>
+		</div>
+  	</body>
+</html>
