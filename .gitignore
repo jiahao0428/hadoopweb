@@ -24,6 +24,7 @@ output/*
 mapper/*
 reducer/*
 models/*
+bin
 
 # Coveralls
 coverage
