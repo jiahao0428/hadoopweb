@@ -1,5 +1,7 @@
 # hadoopweb
 
+A Hadoop web application
+
 ## Requirements
 
 ### python module
