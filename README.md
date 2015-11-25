@@ -1,6 +1,6 @@
 # hadoopweb
 
-A Hadoop web application
+A simple Hadoop web application which can do CRUD of MapReduce Jobs
 
 ## Requirements
 
