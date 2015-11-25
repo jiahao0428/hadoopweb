@@ -46,7 +46,6 @@ execFile('hdfs', [ 'dfs', '-mkdir', hdfs_dir ], function( error, stdout, stderr 
 		});
 
 		job.on( 'close', function (code) {
-  			console.log( 'child process exited with code ' + code );
 		
 			// hadoop job fail	
 			if( code != 0 ) {
@@ -59,7 +58,6 @@ execFile('hdfs', [ 'dfs', '-mkdir', hdfs_dir ], function( error, stdout, stderr 
         	                        execFile( 'hdfs', [ 'dfs', '-copyToLocal', hdfs_dir + '_outdir/part-00000', 'output/' + hdfs_dir + '/part-00000' ], function( error, stdout, stderr ) {
 						execFile( 'hdfs', [ 'dfs', '-rm', '-r', hdfs_dir + '_outdir' ], function( error, stdout, stderr) {
 							execFile( 'hdfs', [ 'dfs', '-rm', '-r', hdfs_dir ], function( error, stdout, stderr ) {
-								console.log(hdfs_dir)
 	                                        		connection.query('UPDATE job SET output_dir = ?, status = ? WHERE id = ?', [ hdfs_dir, status, job_id ]);
 							});
 						});
