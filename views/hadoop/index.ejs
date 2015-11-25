@@ -16,7 +16,7 @@
 						
 
 			app.controller( 'tableList', function ( $scope, $rootScope, $http ) {
-                                $http.get( "job" )
+                                $http.get("job")
                                 .success( function ( response ) { $rootScope.jobs = response; });
 
 				$rootScope.deleteJob = function ( id, index ) {
