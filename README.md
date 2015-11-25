@@ -1,27 +1,27 @@
 # hadoopweb
 
-##Requirements:
+## Requirements
 
-  * **python module**:
+### python module
+ 
+* RestrictedPython
+
+
+
+### node.js module
+ 
+* express
+* formidable (file upload handler)
+* mysql
+* session
+* ejs
+* cookie-parser
+* pm2
+
+### mysql
+
+### angularjs module
   
-    RestrictedPython
+* file-upload
 
-
-
-  * **node.js module**:
-  
-    express
-    formidable (file upload handler)
-    mysql
-    session
-    ejs
-    cookie-parser
-    pm2
-
-  * **mysql**
-
-  * **angularjs module**:
-  
-    file-upload
-
-  * **bootstrap**
+### bootstrap
